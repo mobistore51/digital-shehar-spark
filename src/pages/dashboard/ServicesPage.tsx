@@ -25,9 +25,11 @@ import {
   Trash, 
   Eye,
   Search,
-  FileText,
+  Package2,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  MoveUp,
+  MoveDown
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,55 +38,58 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase, initializeTables } from "@/lib/supabase";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Type definition for pages
-interface Page {
+// Type definition for services
+interface Service {
   id: string;
   title: string;
   slug: string;
-  is_published: boolean;
+  description: string;
+  icon: string;
+  image_url?: string;
+  is_featured: boolean;
+  order_index: number;
   created_at: string;
   updated_at: string;
 }
 
-const PagesList = () => {
-  const [pages, setPages] = useState<Page[]>([]);
+const ServicesPage = () => {
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tableExists, setTableExists] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
-  // Fetch pages from Supabase
-  const fetchPages = async () => {
+  // Fetch services from Supabase
+  const fetchServices = async () => {
     setLoading(true);
     setError(null);
     try {
       const { data, error } = await supabase
-        .from('pages')
+        .from('services')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('order_index', { ascending: true });
 
       if (error) {
         if (error.code === '42P01') {
-          // Table doesn't exist
           setTableExists(false);
           await initializeTables();
           toast({
             title: "Database initialized",
-            description: "We've set up the database tables for you. Try refreshing the page list.",
+            description: "We've set up the database tables for you. Try refreshing the list.",
           });
         } else {
           throw error;
         }
       } else {
         setTableExists(true);
-        setPages(data || []);
+        setServices(data || []);
       }
     } catch (error: any) {
-      console.error('Error fetching pages:', error);
+      console.error('Error fetching services:', error);
       setError(error.message);
       toast({
-        title: "Error fetching pages",
+        title: "Error fetching services",
         description: error.message,
         variant: "destructive",
       });
@@ -102,7 +107,7 @@ const PagesList = () => {
         title: "Database initialized",
         description: "We've set up the database tables for you.",
       });
-      await fetchPages();
+      await fetchServices();
     } catch (error: any) {
       console.error('Error initializing tables:', error);
       toast({
@@ -115,78 +120,123 @@ const PagesList = () => {
     }
   };
 
-  // Delete a page
+  // Delete a service
   const handleDelete = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('pages')
+        .from('services')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
       
       toast({
-        title: "Page deleted",
-        description: "The page has been successfully deleted.",
+        title: "Service deleted",
+        description: "The service has been successfully deleted.",
       });
       
-      // Refresh the page list
-      fetchPages();
+      // Refresh the list
+      fetchServices();
     } catch (error: any) {
-      console.error('Error deleting page:', error);
+      console.error('Error deleting service:', error);
       toast({
-        title: "Error deleting page",
+        title: "Error deleting service",
         description: error.message,
         variant: "destructive",
       });
     }
   };
 
-  // Toggle page publish status
-  const togglePublishStatus = async (id: string, currentStatus: boolean) => {
+  // Toggle service featured status
+  const toggleFeaturedStatus = async (id: string, currentStatus: boolean) => {
     try {
       const { error } = await supabase
-        .from('pages')
-        .update({ is_published: !currentStatus })
+        .from('services')
+        .update({ is_featured: !currentStatus })
         .eq('id', id);
 
       if (error) throw error;
       
       toast({
-        title: currentStatus ? "Page unpublished" : "Page published",
-        description: `The page is now ${currentStatus ? "unpublished" : "published"}.`,
+        title: currentStatus ? "Service unfeatured" : "Service featured",
+        description: `The service is now ${currentStatus ? "unfeatured" : "featured"}.`,
       });
       
-      // Refresh the page list
-      fetchPages();
+      // Refresh the list
+      fetchServices();
     } catch (error: any) {
-      console.error('Error updating page status:', error);
+      console.error('Error updating service status:', error);
       toast({
-        title: "Error updating page",
+        title: "Error updating service",
         description: error.message,
         variant: "destructive",
       });
     }
   };
 
-  // Filter pages based on search term
-  const filteredPages = pages.filter(page => 
-    page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    page.slug.toLowerCase().includes(searchTerm.toLowerCase())
+  // Move service up or down in order
+  const moveService = async (id: string, direction: 'up' | 'down') => {
+    try {
+      const currentIndex = services.findIndex(s => s.id === id);
+      if (currentIndex === -1) return;
+
+      const newServices = [...services];
+      if (direction === 'up' && currentIndex > 0) {
+        const temp = newServices[currentIndex - 1].order_index;
+        newServices[currentIndex - 1].order_index = newServices[currentIndex].order_index;
+        newServices[currentIndex].order_index = temp;
+        
+        // Update both services in database
+        await supabase
+          .from('services')
+          .upsert([
+            newServices[currentIndex - 1],
+            newServices[currentIndex]
+          ]);
+      } else if (direction === 'down' && currentIndex < services.length - 1) {
+        const temp = newServices[currentIndex + 1].order_index;
+        newServices[currentIndex + 1].order_index = newServices[currentIndex].order_index;
+        newServices[currentIndex].order_index = temp;
+        
+        // Update both services in database
+        await supabase
+          .from('services')
+          .upsert([
+            newServices[currentIndex + 1],
+            newServices[currentIndex]
+          ]);
+      }
+
+      // Refresh the list
+      fetchServices();
+    } catch (error: any) {
+      console.error('Error moving service:', error);
+      toast({
+        title: "Error moving service",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Filter services based on search term
+  const filteredServices = services.filter(service => 
+    service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    service.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Load pages on component mount
+  // Load services on component mount
   useEffect(() => {
-    fetchPages();
+    fetchServices();
   }, []);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Pages</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Services</h2>
           <p className="text-muted-foreground">
-            Manage the pages of your website.
+            Manage your business services.
           </p>
         </div>
         <div className="flex gap-2">
@@ -201,9 +251,9 @@ const PagesList = () => {
             </Button>
           )}
           <Button asChild>
-            <Link to="/dashboard/pages/new" className="flex items-center gap-2">
+            <Link to="/dashboard/services/new" className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
-              <span>Add New Page</span>
+              <span>Add New Service</span>
             </Link>
           </Button>
         </div>
@@ -222,16 +272,16 @@ const PagesList = () => {
         <CardHeader className="pb-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <CardTitle>Website Pages</CardTitle>
+              <CardTitle>Your Services</CardTitle>
               <CardDescription>
-                A list of all pages on your website.
+                A list of all services offered by your business.
               </CardDescription>
             </div>
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search pages..."
+                placeholder="Search services..."
                 className="pl-8 w-full md:w-[250px]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -246,11 +296,11 @@ const PagesList = () => {
             </div>
           ) : !tableExists ? (
             <div className="flex flex-col items-center justify-center py-12 space-y-3 text-center">
-              <FileText className="h-12 w-12 text-muted-foreground opacity-50" />
+              <Package2 className="h-12 w-12 text-muted-foreground opacity-50" />
               <div>
                 <p className="text-lg font-medium">Database tables not found</p>
                 <p className="text-sm text-muted-foreground">
-                  You need to initialize the database tables before you can create pages.
+                  You need to initialize the database tables before you can create services.
                 </p>
               </div>
               <Button onClick={handleInitializeTables} className="mt-4">
@@ -258,20 +308,20 @@ const PagesList = () => {
                 Initialize Database
               </Button>
             </div>
-          ) : filteredPages.length === 0 ? (
+          ) : filteredServices.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 space-y-3 text-center">
-              <FileText className="h-12 w-12 text-muted-foreground opacity-50" />
+              <Package2 className="h-12 w-12 text-muted-foreground opacity-50" />
               <div>
-                <p className="text-lg font-medium">No pages found</p>
+                <p className="text-lg font-medium">No services found</p>
                 <p className="text-sm text-muted-foreground">
-                  {searchTerm ? "Try a different search term" : "Get started by creating your first page"}
+                  {searchTerm ? "Try a different search term" : "Get started by creating your first service"}
                 </p>
               </div>
               {!searchTerm && (
                 <Button asChild className="mt-4">
-                  <Link to="/dashboard/pages/new">
+                  <Link to="/dashboard/services/new">
                     <Plus className="mr-2 h-4 w-4" />
-                    Create page
+                    Create service
                   </Link>
                 </Button>
               )}
@@ -281,25 +331,44 @@ const PagesList = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Order</TableHead>
                     <TableHead>Title</TableHead>
-                    <TableHead>Slug</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Last Updated</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Featured</TableHead>
                     <TableHead className="w-[100px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredPages.map((page) => (
-                    <TableRow key={page.id}>
-                      <TableCell className="font-medium">{page.title}</TableCell>
-                      <TableCell className="text-muted-foreground">{page.slug}</TableCell>
+                  {filteredServices.map((service, index) => (
+                    <TableRow key={service.id}>
                       <TableCell>
-                        <Badge variant={page.is_published ? "default" : "outline"}>
-                          {page.is_published ? "Published" : "Draft"}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => moveService(service.id, 'up')}
+                            disabled={index === 0}
+                            className="h-8 w-8"
+                          >
+                            <MoveUp className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => moveService(service.id, 'down')}
+                            disabled={index === services.length - 1}
+                            className="h-8 w-8"
+                          >
+                            <MoveDown className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {new Date(page.updated_at).toLocaleDateString()}
+                      <TableCell className="font-medium">{service.title}</TableCell>
+                      <TableCell className="max-w-md truncate">{service.description}</TableCell>
+                      <TableCell>
+                        <Badge variant={service.is_featured ? "default" : "outline"}>
+                          {service.is_featured ? "Featured" : "Not Featured"}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
@@ -313,27 +382,21 @@ const PagesList = () => {
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
-                              <Link to={`/dashboard/pages/edit/${page.id}`} className="flex items-center">
+                              <Link to={`/dashboard/services/edit/${service.id}`} className="flex items-center">
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link to={`/${page.slug}`} target="_blank" className="flex items-center">
-                                <Eye className="mr-2 h-4 w-4" />
-                                View
-                              </Link>
-                            </DropdownMenuItem>
                             <DropdownMenuItem 
-                              onClick={() => togglePublishStatus(page.id, page.is_published)}
+                              onClick={() => toggleFeaturedStatus(service.id, service.is_featured)}
                             >
                               <Eye className="mr-2 h-4 w-4" />
-                              {page.is_published ? "Unpublish" : "Publish"}
+                              {service.is_featured ? "Unfeature" : "Feature"}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem 
                               className="text-red-600 focus:text-red-600" 
-                              onClick={() => handleDelete(page.id)}
+                              onClick={() => handleDelete(service.id)}
                             >
                               <Trash className="mr-2 h-4 w-4" />
                               Delete
@@ -349,7 +412,7 @@ const PagesList = () => {
           )}
         </CardContent>
         <CardFooter className="border-t p-4 text-sm text-muted-foreground">
-          <Button variant="ghost" size="sm" onClick={fetchPages} className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={fetchServices} className="flex items-center gap-2">
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
@@ -359,4 +422,4 @@ const PagesList = () => {
   );
 };
 
-export default PagesList;
+export default ServicesPage;
