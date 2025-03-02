@@ -1,6 +1,6 @@
 
 import React from "react";
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { 
@@ -19,7 +19,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -35,8 +35,9 @@ const DashboardLayout = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [open, setOpen] = React.useState(false);
+  const location = useLocation();
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
@@ -60,16 +61,15 @@ const DashboardLayout = () => {
       <nav className="flex-1 px-4 space-y-1 mt-4">
         {navItems.map((item) => {
           const Icon = item.icon;
+          const isActive = location.pathname === item.href || location.pathname.startsWith(`${item.href}/`);
           return (
             <Link
               key={item.name}
               to={item.href}
-              className={({ isActive }: { isActive: boolean }) =>
-                cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-gray-100 dark:hover:bg-gray-800",
-                  isActive ? "bg-gray-100 text-marketing-600 dark:bg-gray-800 dark:text-marketing-400" : "text-gray-600 dark:text-gray-300"
-                )
-              }
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-gray-100 dark:hover:bg-gray-800",
+                isActive ? "bg-gray-100 text-marketing-600 dark:bg-gray-800 dark:text-marketing-400" : "text-gray-600 dark:text-gray-300"
+              )}
               onClick={() => setOpen(false)}
             >
               <Icon className="h-5 w-5" />
