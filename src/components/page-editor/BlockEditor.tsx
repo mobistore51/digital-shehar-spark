@@ -1,10 +1,11 @@
 
 import React from "react";
+import { ContentBlock } from "@/types/page";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ContentBlock } from "@/types/page";
+import { ImageBlockEditor } from "./ImageBlockEditor";
 
 interface BlockEditorProps {
   block: ContentBlock;
@@ -12,130 +13,146 @@ interface BlockEditorProps {
 }
 
 export const BlockEditor: React.FC<BlockEditorProps> = ({ block, updateBlockContent }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    updateBlockContent(block.id, { [name]: value });
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    updateBlockContent(block.id, { [name]: value });
+  };
+
   switch (block.type) {
     case 'heading':
       return (
-        <div className="space-y-2">
-          <div className="flex space-x-2">
+        <div className="space-y-4">
+          <div className="grid gap-2">
+            <Label htmlFor={`text-${block.id}`}>Heading Text</Label>
             <Input
-              value={block.content.text || ''}
-              onChange={(e) => updateBlockContent(block.id, { text: e.target.value })}
+              id={`text-${block.id}`}
+              name="text"
+              value={block.content.text || ""}
+              onChange={handleInputChange}
               placeholder="Heading text"
-              className="flex-1"
             />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor={`level-${block.id}`}>Heading Level</Label>
             <Select
-              value={block.content.level || 'h2'}
-              onValueChange={(value) => updateBlockContent(block.id, { level: value })}
+              value={block.content.level || "h2"}
+              onValueChange={(value) => handleSelectChange("level", value)}
             >
-              <SelectTrigger className="w-[100px]">
-                <SelectValue placeholder="Level" />
+              <SelectTrigger id={`level-${block.id}`}>
+                <SelectValue placeholder="Select heading level" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="h1">H1</SelectItem>
-                <SelectItem value="h2">H2</SelectItem>
-                <SelectItem value="h3">H3</SelectItem>
-                <SelectItem value="h4">H4</SelectItem>
+                <SelectItem value="h1">Heading 1 (H1)</SelectItem>
+                <SelectItem value="h2">Heading 2 (H2)</SelectItem>
+                <SelectItem value="h3">Heading 3 (H3)</SelectItem>
+                <SelectItem value="h4">Heading 4 (H4)</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
       );
-    
+
     case 'paragraph':
       return (
-        <Textarea
-          value={block.content.text || ''}
-          onChange={(e) => updateBlockContent(block.id, { text: e.target.value })}
-          placeholder="Paragraph text"
-          rows={4}
-        />
-      );
-    
-    case 'image':
-      return (
-        <div className="space-y-2">
-          <div className="flex space-x-2">
-            <Input
-              value={block.content.url || ''}
-              onChange={(e) => updateBlockContent(block.id, { url: e.target.value })}
-              placeholder="Image URL"
-            />
-          </div>
-          <Input
-            value={block.content.alt || ''}
-            onChange={(e) => updateBlockContent(block.id, { alt: e.target.value })}
-            placeholder="Alt text"
-          />
-          <Input
-            value={block.content.caption || ''}
-            onChange={(e) => updateBlockContent(block.id, { caption: e.target.value })}
-            placeholder="Caption (optional)"
+        <div className="grid gap-2">
+          <Label htmlFor={`text-${block.id}`}>Paragraph Text</Label>
+          <Textarea
+            id={`text-${block.id}`}
+            name="text"
+            value={block.content.text || ""}
+            onChange={handleInputChange}
+            placeholder="Paragraph text"
+            rows={4}
           />
         </div>
       );
-    
+
+    case 'image':
+      return <ImageBlockEditor block={block} updateBlockContent={updateBlockContent} />;
+
     case 'quote':
       return (
-        <div className="space-y-2">
-          <Textarea
-            value={block.content.text || ''}
-            onChange={(e) => updateBlockContent(block.id, { text: e.target.value })}
-            placeholder="Quote text"
-            rows={3}
-          />
-          <Input
-            value={block.content.author || ''}
-            onChange={(e) => updateBlockContent(block.id, { author: e.target.value })}
-            placeholder="Author (optional)"
-          />
+        <div className="space-y-4">
+          <div className="grid gap-2">
+            <Label htmlFor={`text-${block.id}`}>Quote Text</Label>
+            <Textarea
+              id={`text-${block.id}`}
+              name="text"
+              value={block.content.text || ""}
+              onChange={handleInputChange}
+              placeholder="Quote text"
+              rows={4}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor={`author-${block.id}`}>Author (optional)</Label>
+            <Input
+              id={`author-${block.id}`}
+              name="author"
+              value={block.content.author || ""}
+              onChange={handleInputChange}
+              placeholder="Quote author"
+            />
+          </div>
         </div>
       );
-    
+
     case 'columns':
       return (
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Column 1</Label>
-              <Textarea
-                value={block.content.columns?.[0]?.text || ''}
-                onChange={(e) => {
-                  const columns = [...(block.content.columns || [])];
-                  columns[0] = { ...columns[0], text: e.target.value };
-                  updateBlockContent(block.id, { columns });
-                }}
-                placeholder="Column 1 content"
-                rows={3}
-              />
-            </div>
-            <div>
-              <Label>Column 2</Label>
-              <Textarea
-                value={block.content.columns?.[1]?.text || ''}
-                onChange={(e) => {
-                  const columns = [...(block.content.columns || [])];
-                  columns[1] = { ...columns[1], text: e.target.value };
-                  updateBlockContent(block.id, { columns });
-                }}
-                placeholder="Column 2 content"
-                rows={3}
-              />
-            </div>
+          <div className="grid gap-2">
+            <Label htmlFor={`column1-${block.id}`}>Column 1</Label>
+            <Textarea
+              id={`column1-${block.id}`}
+              name="columns[0].text"
+              value={block.content.columns?.[0]?.text || ""}
+              onChange={(e) => {
+                const columns = [...(block.content.columns || [{}, {}])];
+                columns[0] = { ...columns[0], text: e.target.value };
+                updateBlockContent(block.id, { columns });
+              }}
+              placeholder="Column 1 content"
+              rows={4}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor={`column2-${block.id}`}>Column 2</Label>
+            <Textarea
+              id={`column2-${block.id}`}
+              name="columns[1].text"
+              value={block.content.columns?.[1]?.text || ""}
+              onChange={(e) => {
+                const columns = [...(block.content.columns || [{}, {}])];
+                columns[1] = { ...columns[1], text: e.target.value };
+                updateBlockContent(block.id, { columns });
+              }}
+              placeholder="Column 2 content"
+              rows={4}
+            />
           </div>
         </div>
       );
-    
+
     case 'html':
       return (
-        <Textarea
-          value={block.content.code || ''}
-          onChange={(e) => updateBlockContent(block.id, { code: e.target.value })}
-          placeholder="Custom HTML"
-          rows={6}
-          className="font-mono text-sm"
-        />
+        <div className="grid gap-2">
+          <Label htmlFor={`code-${block.id}`}>HTML Code</Label>
+          <Textarea
+            id={`code-${block.id}`}
+            name="code"
+            value={block.content.code || ""}
+            onChange={handleInputChange}
+            placeholder="<!-- Enter HTML code here -->"
+            rows={8}
+            className="font-mono text-sm"
+          />
+        </div>
       );
-    
+
     default:
       return <div>Unknown block type</div>;
   }
