@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,31 +37,31 @@ import {
   Loader2
 } from "lucide-react";
 
-// Dummy media items for demonstration
-const dummyImages = [
-  { id: '1', name: 'hero-image.jpg', url: '/placeholder.svg', type: 'image', size: '345 KB', uploaded: '2023-04-15' },
-  { id: '2', name: 'team-photo.jpg', url: '/placeholder.svg', type: 'image', size: '1.2 MB', uploaded: '2023-04-10' },
-  { id: '3', name: 'product-banner.jpg', url: '/placeholder.svg', type: 'image', size: '780 KB', uploaded: '2023-04-05' },
-  { id: '4', name: 'office-location.jpg', url: '/placeholder.svg', type: 'image', size: '550 KB', uploaded: '2023-04-01' },
-  { id: '5', name: 'client-meeting.jpg', url: '/placeholder.svg', type: 'image', size: '890 KB', uploaded: '2023-03-28' },
-  { id: '6', name: 'logo-dark.png', url: '/placeholder.svg', type: 'image', size: '120 KB', uploaded: '2023-03-25' },
-];
-
-const dummyFiles = [
-  { id: '7', name: 'company-brochure.pdf', url: '#', type: 'file', size: '2.4 MB', uploaded: '2023-04-12' },
-  { id: '8', name: 'pricing-sheet.pdf', url: '#', type: 'file', size: '450 KB', uploaded: '2023-04-08' },
-  { id: '9', name: 'contract-template.docx', url: '#', type: 'file', size: '380 KB', uploaded: '2023-04-03' },
-  { id: '10', name: 'case-study.pdf', url: '#', type: 'file', size: '1.7 MB', uploaded: '2023-03-30' },
-];
-
 interface MediaItem {
   id: string;
   name: string;
   url: string;
-  type: 'image' | 'file';
+  type: "image" | "file";
   size: string;
   uploaded: string;
 }
+
+// Dummy media items for demonstration
+const dummyImages: MediaItem[] = [
+  { id: '1', name: 'hero-image.jpg', url: '/placeholder.svg', type: "image", size: '345 KB', uploaded: '2023-04-15' },
+  { id: '2', name: 'team-photo.jpg', url: '/placeholder.svg', type: "image", size: '1.2 MB', uploaded: '2023-04-10' },
+  { id: '3', name: 'product-banner.jpg', url: '/placeholder.svg', type: "image", size: '780 KB', uploaded: '2023-04-05' },
+  { id: '4', name: 'office-location.jpg', url: '/placeholder.svg', type: "image", size: '550 KB', uploaded: '2023-04-01' },
+  { id: '5', name: 'client-meeting.jpg', url: '/placeholder.svg', type: "image", size: '890 KB', uploaded: '2023-03-28' },
+  { id: '6', name: 'logo-dark.png', url: '/placeholder.svg', type: "image", size: '120 KB', uploaded: '2023-03-25' },
+];
+
+const dummyFiles: MediaItem[] = [
+  { id: '7', name: 'company-brochure.pdf', url: '#', type: "file", size: '2.4 MB', uploaded: '2023-04-12' },
+  { id: '8', name: 'pricing-sheet.pdf', url: '#', type: "file", size: '450 KB', uploaded: '2023-04-08' },
+  { id: '9', name: 'contract-template.docx', url: '#', type: "file", size: '380 KB', uploaded: '2023-04-03' },
+  { id: '10', name: 'case-study.pdf', url: '#', type: "file", size: '1.7 MB', uploaded: '2023-03-30' },
+];
 
 const MediaPage = () => {
   const [activeTab, setActiveTab] = useState<string>("images");

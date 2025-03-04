@@ -18,6 +18,8 @@ import BlogPostsPage from "./pages/dashboard/BlogPostsPage";
 import MediaPage from "./pages/dashboard/MediaPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import DynamicPage from "./components/DynamicPage";
+import ServiceEditor from "./pages/dashboard/services/ServiceEditor";
+import BlogPostEditor from "./pages/dashboard/blog/BlogPostEditor";
 
 const queryClient = new QueryClient();
 
@@ -39,8 +41,12 @@ const App = () => (
               <Route path="pages/new" element={<PageEditor />} />
               <Route path="pages/edit/:id" element={<PageEditor />} />
               <Route path="services" element={<ServicesPage />} />
+              <Route path="services/new" element={<ServiceEditor />} />
+              <Route path="services/edit/:id" element={<ServiceEditor />} />
               <Route path="testimonials" element={<TestimonialsPage />} />
               <Route path="blog" element={<BlogPostsPage />} />
+              <Route path="blog/new" element={<BlogPostEditor />} />
+              <Route path="blog/edit/:id" element={<BlogPostEditor />} />
               <Route path="media" element={<MediaPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
