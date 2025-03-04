@@ -25,9 +25,10 @@ import {
   Trash, 
   Eye,
   Search,
-  Package,
+  MessageSquare,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Calendar
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -35,43 +36,42 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 
-// Type definition for services
-interface Service {
+// Type definition for blog posts
+interface BlogPost {
   id: string;
   title: string;
   slug: string;
-  description: string;
-  icon: string;
-  is_featured: boolean;
-  order_index: number;
+  excerpt: string;
+  is_published: boolean;
+  published_at: string | null;
   created_at: string;
   updated_at: string;
 }
 
-const ServicesPage = () => {
-  const [services, setServices] = useState<Service[]>([]);
+const BlogPostsPage = () => {
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
-  // Fetch services from Supabase
-  const fetchServices = async () => {
+  // Fetch blog posts from Supabase
+  const fetchBlogPosts = async () => {
     setLoading(true);
     setError(null);
     try {
       const { data, error } = await supabase
-        .from('services')
+        .from('blog_posts')
         .select('*')
-        .order('order_index', { ascending: true });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setServices(data || []);
+      setBlogPosts(data || []);
     } catch (error: any) {
-      console.error('Error fetching services:', error);
+      console.error('Error fetching blog posts:', error);
       setError(error.message);
       toast({
-        title: "Error fetching services",
+        title: "Error fetching blog posts",
         description: error.message,
         variant: "destructive",
       });
@@ -80,84 +80,100 @@ const ServicesPage = () => {
     }
   };
 
-  // Delete a service
+  // Delete a blog post
   const handleDelete = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('services')
+        .from('blog_posts')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
       
       toast({
-        title: "Service deleted",
-        description: "The service has been successfully deleted.",
+        title: "Blog post deleted",
+        description: "The blog post has been successfully deleted.",
       });
       
-      // Refresh the service list
-      fetchServices();
+      // Refresh the blog post list
+      fetchBlogPosts();
     } catch (error: any) {
-      console.error('Error deleting service:', error);
+      console.error('Error deleting blog post:', error);
       toast({
-        title: "Error deleting service",
+        title: "Error deleting blog post",
         description: error.message,
         variant: "destructive",
       });
     }
   };
 
-  // Toggle service featured status
-  const toggleFeaturedStatus = async (id: string, currentStatus: boolean) => {
+  // Toggle blog post publish status
+  const togglePublishStatus = async (id: string, currentStatus: boolean) => {
     try {
+      const published_at = currentStatus ? null : new Date().toISOString();
+      
       const { error } = await supabase
-        .from('services')
-        .update({ is_featured: !currentStatus })
+        .from('blog_posts')
+        .update({ 
+          is_published: !currentStatus,
+          published_at: !currentStatus ? published_at : null
+        })
         .eq('id', id);
 
       if (error) throw error;
       
       toast({
-        title: currentStatus ? "Service unfeatured" : "Service featured",
-        description: `The service is now ${currentStatus ? "unfeatured" : "featured"}.`,
+        title: currentStatus ? "Blog post unpublished" : "Blog post published",
+        description: `The blog post is now ${currentStatus ? "unpublished" : "published"}.`,
       });
       
-      // Refresh the service list
-      fetchServices();
+      // Refresh the blog post list
+      fetchBlogPosts();
     } catch (error: any) {
-      console.error('Error updating service status:', error);
+      console.error('Error updating blog post status:', error);
       toast({
-        title: "Error updating service",
+        title: "Error updating blog post",
         description: error.message,
         variant: "destructive",
       });
     }
   };
 
-  // Filter services based on search term
-  const filteredServices = services.filter(service => 
-    service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    service.description.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter blog posts based on search term
+  const filteredBlogPosts = blogPosts.filter(post => 
+    post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    post.slug.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Load services on component mount
+  // Format date for display
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "—";
+    return new Date(dateString).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  // Load blog posts on component mount
   useEffect(() => {
-    fetchServices();
+    fetchBlogPosts();
   }, []);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Services</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Blog Posts</h2>
           <p className="text-muted-foreground">
-            Manage your business services.
+            Create and manage your blog content.
           </p>
         </div>
         <Button asChild>
-          <Link to="/dashboard/services/new" className="flex items-center gap-2">
+          <Link to="/dashboard/blog/new" className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            <span>Add New Service</span>
+            <span>Create Post</span>
           </Link>
         </Button>
       </div>
@@ -166,16 +182,16 @@ const ServicesPage = () => {
         <CardHeader className="pb-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <CardTitle>Services</CardTitle>
+              <CardTitle>All Blog Posts</CardTitle>
               <CardDescription>
-                Manage your business service offerings.
+                View and manage your blog articles.
               </CardDescription>
             </div>
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search services..."
+                placeholder="Search posts..."
                 className="pl-8 w-full md:w-[250px]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -188,20 +204,20 @@ const ServicesPage = () => {
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-          ) : filteredServices.length === 0 ? (
+          ) : filteredBlogPosts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 space-y-3 text-center">
-              <Package className="h-12 w-12 text-muted-foreground opacity-50" />
+              <MessageSquare className="h-12 w-12 text-muted-foreground opacity-50" />
               <div>
-                <p className="text-lg font-medium">No services found</p>
+                <p className="text-lg font-medium">No blog posts found</p>
                 <p className="text-sm text-muted-foreground">
-                  {searchTerm ? "Try a different search term" : "Get started by creating your first service"}
+                  {searchTerm ? "Try a different search term" : "Get started by creating your first blog post"}
                 </p>
               </div>
               {!searchTerm && (
                 <Button asChild className="mt-4">
-                  <Link to="/dashboard/services/new">
+                  <Link to="/dashboard/blog/new">
                     <Plus className="mr-2 h-4 w-4" />
-                    Create service
+                    Create post
                   </Link>
                 </Button>
               )}
@@ -212,23 +228,42 @@ const ServicesPage = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Title</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Featured</TableHead>
-                    <TableHead>Order</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Published Date</TableHead>
+                    <TableHead>Created Date</TableHead>
                     <TableHead className="w-[100px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredServices.map((service) => (
-                    <TableRow key={service.id}>
-                      <TableCell className="font-medium">{service.title}</TableCell>
-                      <TableCell className="text-muted-foreground max-w-xs truncate">{service.description}</TableCell>
+                  {filteredBlogPosts.map((post) => (
+                    <TableRow key={post.id}>
                       <TableCell>
-                        <Badge variant={service.is_featured ? "default" : "outline"}>
-                          {service.is_featured ? "Featured" : "Not Featured"}
+                        <div>
+                          <p className="font-medium">{post.title}</p>
+                          <p className="text-xs text-muted-foreground truncate max-w-xs">{post.excerpt || post.slug}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={post.is_published ? "default" : "outline"}>
+                          {post.is_published ? "Published" : "Draft"}
                         </Badge>
                       </TableCell>
-                      <TableCell>{service.order_index}</TableCell>
+                      <TableCell>
+                        {post.published_at ? (
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-3 w-3 text-muted-foreground" />
+                            <span>{formatDate(post.published_at)}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-3 w-3 text-muted-foreground" />
+                          <span>{formatDate(post.created_at)}</span>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -241,27 +276,27 @@ const ServicesPage = () => {
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
-                              <Link to={`/dashboard/services/edit/${service.id}`} className="flex items-center">
+                              <Link to={`/dashboard/blog/edit/${post.id}`} className="flex items-center">
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                              <Link to={`/services/${service.slug}`} target="_blank" className="flex items-center">
+                              <Link to={`/blog/${post.slug}`} target="_blank" className="flex items-center">
                                 <Eye className="mr-2 h-4 w-4" />
                                 View
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem 
-                              onClick={() => toggleFeaturedStatus(service.id, service.is_featured)}
+                              onClick={() => togglePublishStatus(post.id, post.is_published)}
                             >
                               <Eye className="mr-2 h-4 w-4" />
-                              {service.is_featured ? "Unfeature" : "Feature"}
+                              {post.is_published ? "Unpublish" : "Publish"}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem 
                               className="text-red-600 focus:text-red-600" 
-                              onClick={() => handleDelete(service.id)}
+                              onClick={() => handleDelete(post.id)}
                             >
                               <Trash className="mr-2 h-4 w-4" />
                               Delete
@@ -277,7 +312,7 @@ const ServicesPage = () => {
           )}
         </CardContent>
         <CardFooter className="border-t p-4 text-sm text-muted-foreground">
-          <Button variant="ghost" size="sm" onClick={fetchServices} className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={fetchBlogPosts} className="flex items-center gap-2">
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
@@ -287,4 +322,4 @@ const ServicesPage = () => {
   );
 };
 
-export default ServicesPage;
+export default BlogPostsPage;

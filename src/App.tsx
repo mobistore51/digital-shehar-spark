@@ -12,6 +12,11 @@ import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 import PagesList from "./pages/dashboard/PagesList";
 import PageEditor from "./pages/dashboard/PageEditor";
+import ServicesPage from "./pages/dashboard/ServicesPage";
+import TestimonialsPage from "./pages/dashboard/TestimonialsPage";
+import BlogPostsPage from "./pages/dashboard/BlogPostsPage";
+import MediaPage from "./pages/dashboard/MediaPage";
+import SettingsPage from "./pages/dashboard/SettingsPage";
 import DynamicPage from "./components/DynamicPage";
 
 const queryClient = new QueryClient();
@@ -33,7 +38,11 @@ const App = () => (
               <Route path="pages" element={<PagesList />} />
               <Route path="pages/new" element={<PageEditor />} />
               <Route path="pages/edit/:id" element={<PageEditor />} />
-              {/* Additional dashboard routes will go here */}
+              <Route path="services" element={<ServicesPage />} />
+              <Route path="testimonials" element={<TestimonialsPage />} />
+              <Route path="blog" element={<BlogPostsPage />} />
+              <Route path="media" element={<MediaPage />} />
+              <Route path="settings" element={<SettingsPage />} />
             </Route>
             
             {/* Dynamic Page Route */}
