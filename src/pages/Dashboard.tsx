@@ -1,26 +1,19 @@
+
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   FileText, 
   Users, 
   Package, 
   BarChart, 
   Edit, 
-  Plus, 
-  Activity, 
-  Clock, 
-  CheckCircle, 
-  Star, 
-  Calendar,
-  Shield,
-  Code,
-  ShoppingCart
+  Plus 
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import StatCard from "@/components/dashboard/StatCard";
+import ActivityCard from "@/components/dashboard/ActivityCard";
+import QuickActionsCard from "@/components/dashboard/QuickActionsCard";
+import FeaturesTable from "@/components/dashboard/FeaturesTable";
+import { getCategoryIcon, getStatusColor } from "@/components/dashboard/CategoryIconHelper";
+import { Feature } from "@/components/dashboard/FeaturesTable";
 
 const statCards = [
   {
@@ -67,7 +60,7 @@ const quickActions = [
 ];
 
 // Latest features added to the platform
-const latestFeatures = [
+const latestFeatures: Feature[] = [
   { id: 1, name: "AI Content Generator", date: "June 15, 2024", status: "New", category: "Content" },
   { id: 2, name: "Dark Mode Support", date: "June 14, 2024", status: "New", category: "UI" },
   { id: 3, name: "Advanced Analytics Dashboard", date: "June 12, 2024", status: "New", category: "Analytics" },
@@ -100,53 +93,7 @@ const latestFeatures = [
   { id: 30, name: "Marketing Automation", date: "April 5, 2024", status: "New", category: "Marketing" },
 ];
 
-const getCategoryIcon = (category: string) => {
-  switch (category) {
-    case "Content":
-      return FileText;
-    case "UI":
-    case "Design":
-      return Edit;
-    case "Analytics":
-      return BarChart;
-    case "SEO":
-    case "Marketing":
-      return Activity;
-    case "Infrastructure":
-    case "Performance":
-      return CheckCircle;
-    case "Media":
-      return FileText;
-    case "Collaboration":
-    case "Client Management":
-      return Users;
-    case "Security":
-      return Shield;
-    case "Development":
-      return Code;
-    case "E-commerce":
-      return ShoppingCart;
-    case "Organization":
-      return Calendar;
-    default:
-      return Star;
-  }
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "New":
-      return "bg-green-100 text-green-800";
-    case "Updated":
-      return "bg-blue-100 text-blue-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
 const Dashboard = () => {
-  const { user } = useAuth();
-  
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -160,119 +107,28 @@ const Dashboard = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((card, i) => (
-          <Card key={i}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-              <div className={`p-2 rounded-full ${card.color}`}>
-                <card.icon className="h-4 w-4" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{card.value}</div>
-              <p className="text-xs text-muted-foreground">{card.description}</p>
-            </CardContent>
-          </Card>
+          <StatCard 
+            key={i}
+            title={card.title}
+            value={card.value}
+            description={card.description}
+            icon={card.icon}
+            color={card.color}
+          />
         ))}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your latest website updates</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-0">
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-4 border-b pb-4 last:border-0 last:pb-0">
-                  <div className="rounded-full p-2 bg-gray-100">
-                    <Edit className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">
-                      {activity.action}: <span className="text-muted-foreground">{activity.target}</span>
-                    </p>
-                    <p className="text-xs text-muted-foreground">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Manage your website content</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {quickActions.map((action, i) => (
-              <Button 
-                key={i} 
-                className={`w-full justify-start text-white ${action.color}`}
-                asChild
-              >
-                <Link to={action.path} className="flex items-center gap-2">
-                  <action.icon className="h-4 w-4" />
-                  <span>{action.title}</span>
-                </Link>
-              </Button>
-            ))}
-          </CardContent>
-        </Card>
+        <ActivityCard activities={recentActivities} />
+        <QuickActionsCard actions={quickActions} />
       </div>
 
       {/* Latest Features Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Latest Platform Features</CardTitle>
-          <CardDescription>30 recently launched features and updates</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-auto max-h-[450px] pr-2">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px]"></TableHead>
-                  <TableHead>Feature</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Release Date</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {latestFeatures.map((feature) => {
-                  const IconComponent = getCategoryIcon(feature.category);
-                  return (
-                    <TableRow key={feature.id}>
-                      <TableCell>
-                        <div className={`p-2 rounded-full bg-gray-100`}>
-                          <IconComponent className="h-4 w-4 text-gray-600" />
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium">{feature.name}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{feature.category}</Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-3 w-3" />
-                          {feature.date}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(feature.status)}>
-                          {feature.status}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+      <FeaturesTable 
+        features={latestFeatures} 
+        getCategoryIcon={getCategoryIcon}
+        getStatusColor={getStatusColor}
+      />
     </div>
   );
 };
