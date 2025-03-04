@@ -37,12 +37,13 @@ const DynamicPage = () => {
       setError(null);
       
       try {
+        // Using maybeSingle() instead of single() to properly handle cases where no record is found
         const { data, error } = await supabase
           .from('pages')
           .select('*')
           .eq('slug', slug)
           .eq('is_published', true)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         
