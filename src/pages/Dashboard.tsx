@@ -14,6 +14,7 @@ import QuickActionsCard from "@/components/dashboard/QuickActionsCard";
 import FeaturesTable from "@/components/dashboard/FeaturesTable";
 import { getCategoryIcon, getStatusColor } from "@/components/dashboard/CategoryIconHelper";
 import { Feature } from "@/components/dashboard/FeaturesTable";
+import AnalyticsSection from "@/components/dashboard/AnalyticsSection";
 
 const statCards = [
   {
@@ -117,6 +118,9 @@ const Dashboard = () => {
           />
         ))}
       </div>
+
+      {/* Analytics Section */}
+      <AnalyticsSection />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <ActivityCard activities={recentActivities} />
