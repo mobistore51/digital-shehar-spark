@@ -21,6 +21,13 @@ import DynamicPage from "./components/DynamicPage";
 import ServiceEditor from "./pages/dashboard/services/ServiceEditor";
 import BlogPostEditor from "./pages/dashboard/blog/BlogPostEditor";
 
+// Import the new pages
+import Services from "./pages/Services";
+import About from "./pages/About";
+import Portfolio from "./pages/Portfolio";
+import Blog from "./pages/Blog";
+import Contact from "./pages/Contact";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -33,6 +40,13 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            
+            {/* New static routes */}
+            <Route path="/services" element={<Services />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/contact" element={<Contact />} />
             
             {/* Dashboard Routes */}
             <Route path="/dashboard" element={<DashboardLayout />}>
