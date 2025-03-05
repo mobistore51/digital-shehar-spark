@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,8 +16,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, ImagePlus, Calendar, Tag, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, ImagePlus, Calendar, Tag, Loader2, Eye, EyeOff } from "lucide-react";
 import { LoadingState } from "@/components/page-editor/LoadingState";
+import { ContentBlocks } from "@/components/blog-editor/ContentBlocks";
+import { useBlogEditor } from "@/hooks/use-blog-editor";
+import { ContentBlock } from "@/types/page";
 
 const BlogPostEditor = () => {
   const { id } = useParams();
@@ -25,49 +28,83 @@ const BlogPostEditor = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [post, setPost] = useState({
+  const [postBasics, setPostBasics] = useState({
     title: "",
     slug: "",
     excerpt: "",
     featuredImage: "",
-    content: "",
     isPublished: false,
     categories: [] as string[],
     tags: [] as string[]
   });
+  
+  // Use our custom hook for the content blocks
+  const {
+    blocks,
+    showPreview,
+    togglePreview,
+    addContentBlock,
+    updateBlockContent,
+    moveBlock,
+    removeBlock,
+    setBlocks
+  } = useBlogEditor([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (id) {
       setLoading(true);
       // Simulate loading post data
       setTimeout(() => {
-        setPost({
+        setPostBasics({
           title: "Sample Blog Post",
           slug: "sample-blog-post",
           excerpt: "This is a sample blog post for demonstration purposes.",
           featuredImage: "/placeholder.svg",
-          content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
           isPublished: true,
           categories: ["Marketing", "Digital"],
           tags: ["seo", "content"]
         });
+        
+        // Add sample content blocks
+        const sampleBlocks: ContentBlock[] = [
+          {
+            id: "1",
+            type: "heading",
+            content: { text: "Sample Blog Post", level: "h1" }
+          },
+          {
+            id: "2",
+            type: "paragraph",
+            content: { text: "This is a sample paragraph for the blog post. It demonstrates how content blocks work in the editor." }
+          }
+        ];
+        setBlocks(sampleBlocks);
+        
         setLoading(false);
       }, 1000);
     }
-  }, [id]);
+  }, [id, setBlocks]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setPost(prev => ({ ...prev, [name]: value }));
+    setPostBasics(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSwitchChange = (checked: boolean) => {
-    setPost(prev => ({ ...prev, isPublished: checked }));
+    setPostBasics(prev => ({ ...prev, isPublished: checked }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    
+    // Construct the complete post object with both basic info and content blocks
+    const completePost = {
+      ...postBasics,
+      content: blocks
+    };
+    
+    console.log("Saving post:", completePost);
     
     // Simulate saving
     setTimeout(() => {
@@ -96,6 +133,19 @@ const BlogPostEditor = () => {
           </h2>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={togglePreview}>
+            {showPreview ? (
+              <>
+                <EyeOff className="mr-2 h-4 w-4" />
+                Edit Mode
+              </>
+            ) : (
+              <>
+                <Eye className="mr-2 h-4 w-4" />
+                Preview
+              </>
+            )}
+          </Button>
           <Button variant="outline" onClick={() => navigate("/dashboard/blog")}>
             Cancel
           </Button>
@@ -130,8 +180,8 @@ const BlogPostEditor = () => {
                 <Input 
                   id="title" 
                   name="title" 
-                  value={post.title} 
-                  onChange={handleChange} 
+                  value={postBasics.title} 
+                  onChange={handleBasicInfoChange} 
                   placeholder="Enter blog post title" 
                 />
               </div>
@@ -140,8 +190,8 @@ const BlogPostEditor = () => {
                 <Input 
                   id="slug" 
                   name="slug" 
-                  value={post.slug} 
-                  onChange={handleChange} 
+                  value={postBasics.slug} 
+                  onChange={handleBasicInfoChange} 
                   placeholder="enter-slug-here" 
                 />
               </div>
@@ -150,23 +200,22 @@ const BlogPostEditor = () => {
                 <Textarea 
                   id="excerpt" 
                   name="excerpt" 
-                  value={post.excerpt} 
-                  onChange={handleChange} 
+                  value={postBasics.excerpt} 
+                  onChange={handleBasicInfoChange} 
                   placeholder="Brief summary of your post" 
                   rows={3} 
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="content">Content</Label>
-                <Textarea 
-                  id="content" 
-                  name="content" 
-                  value={post.content} 
-                  onChange={handleChange} 
-                  placeholder="Write your blog post content here" 
-                  rows={10} 
-                />
-              </div>
+              
+              {/* Content Blocks Editor */}
+              <ContentBlocks 
+                blocks={blocks}
+                showPreview={showPreview}
+                addContentBlock={addContentBlock}
+                updateBlockContent={updateBlockContent}
+                moveBlock={moveBlock}
+                removeBlock={removeBlock}
+              />
             </CardContent>
           </Card>
         </div>
@@ -184,7 +233,7 @@ const BlogPostEditor = () => {
                 <Label htmlFor="published" className="cursor-pointer">Publish</Label>
                 <Switch 
                   id="published" 
-                  checked={post.isPublished} 
+                  checked={postBasics.isPublished} 
                   onCheckedChange={handleSwitchChange} 
                 />
               </div>
@@ -199,9 +248,9 @@ const BlogPostEditor = () => {
                   </Label>
                   <div className="flex flex-col gap-2">
                     <div className="border rounded aspect-video overflow-hidden bg-muted flex items-center justify-center">
-                      {post.featuredImage ? (
+                      {postBasics.featuredImage ? (
                         <img 
-                          src={post.featuredImage} 
+                          src={postBasics.featuredImage} 
                           alt="Featured" 
                           className="w-full h-full object-cover" 
                         />
@@ -225,8 +274,8 @@ const BlogPostEditor = () => {
                   </Label>
                   <Input 
                     placeholder="Marketing, Digital, SEO" 
-                    value={post.categories.join(", ")} 
-                    onChange={(e) => setPost(prev => ({ 
+                    value={postBasics.categories.join(", ")} 
+                    onChange={(e) => setPostBasics(prev => ({ 
                       ...prev, 
                       categories: e.target.value.split(",").map(cat => cat.trim()).filter(Boolean)
                     }))} 
@@ -240,8 +289,8 @@ const BlogPostEditor = () => {
                   </Label>
                   <Input 
                     placeholder="seo, content-marketing, digital" 
-                    value={post.tags.join(", ")} 
-                    onChange={(e) => setPost(prev => ({ 
+                    value={postBasics.tags.join(", ")} 
+                    onChange={(e) => setPostBasics(prev => ({ 
                       ...prev, 
                       tags: e.target.value.split(",").map(tag => tag.trim()).filter(Boolean)
                     }))} 
