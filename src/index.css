@@ -43,7 +43,7 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased overflow-x-hidden;
+    @apply bg-background text-foreground antialiased overflow-x-hidden font-sans;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -51,13 +51,13 @@
   }
 
   ::selection {
-    @apply bg-marketing-400 text-white;
+    @apply bg-marketing-500 text-white;
   }
 }
 
 @layer components {
   .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm;
+    @apply bg-white/80 backdrop-blur-md border border-white/40 shadow-sm hover:bg-white/90 transition-colors duration-300;
   }
   
   .container-tight {
@@ -65,7 +65,7 @@
   }
   
   .section-padding {
-    @apply py-12 md:py-20 lg:py-28;
+    @apply py-16 px-4 md:py-24 md:px-8 lg:py-32 lg:px-0;
   }
   
   .hero-heading {
@@ -109,20 +109,60 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-marketing-500 px-5 py-3 text-base font-medium text-white shadow-sm hover:bg-marketing-600 focus:outline-none focus:ring-2 focus:ring-marketing-400 focus:ring-offset-2 transition-all duration-200;
+    @apply inline-flex items-center justify-center rounded-lg bg-marketing-500 px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-marketing-600 focus:outline-none focus:ring-2 focus:ring-marketing-400 focus:ring-offset-2 transition-all duration-200;
   }
   
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg bg-secondary px-5 py-3 text-base font-medium text-white shadow-sm hover:bg-secondary/90 focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:ring-offset-2 transition-all duration-200;
+    @apply inline-flex items-center justify-center rounded-lg bg-secondary px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-secondary/90 focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:ring-offset-2 transition-all duration-200;
   }
   
   .btn-outline {
-    @apply inline-flex items-center justify-center rounded-lg border border-marketing-200 bg-transparent px-5 py-3 text-base font-medium text-marketing-700 shadow-sm hover:bg-marketing-50 focus:outline-none focus:ring-2 focus:ring-marketing-200 focus:ring-offset-2 transition-all duration-200;
+    @apply inline-flex items-center justify-center rounded-lg border border-marketing-200 bg-transparent px-5 py-3 text-base font-semibold text-marketing-700 shadow-sm hover:bg-marketing-50 focus:outline-none focus:ring-2 focus:ring-marketing-200 focus:ring-offset-2 transition-all duration-200;
+  }
+  
+  /* Improved responsive utilities */
+  .responsive-container {
+    @apply w-full px-4 mx-auto sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl;
+  }
+  
+  /* Improved animation classes */
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Improved hover effects */
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1;
+  }
+  
+  .hover-glow {
+    @apply transition-shadow duration-300 hover:shadow-lg hover:shadow-marketing-500/20;
+  }
+  
+  /* Responsive utilities */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

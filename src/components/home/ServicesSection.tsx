@@ -1,22 +1,39 @@
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   Share2, Code, PenTool, Search, BarChart, Facebook, Instagram, ArrowRight
 } from "lucide-react";
 
 const ServicesSection = () => {
-  const animateOnScroll = () => {
-    const elements = document.querySelectorAll('.animate-reveal');
+  // Improved animation with better performance
+  useEffect(() => {
+    // Using Intersection Observer for better performance
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
     
-    const observer = new IntersectionObserver((entries) => {
+    const handleIntersect = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('in-view');
+          // Add class with delay based on data attribute
+          const element = entry.target as HTMLElement;
+          const delay = element.dataset.delay || '0';
+          setTimeout(() => {
+            element.classList.add('in-view');
+          }, parseInt(delay));
+          
+          // Unobserve after animation
+          observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
-
+    };
+    
+    const observer = new IntersectionObserver(handleIntersect, observerOptions);
+    const elements = document.querySelectorAll('.animate-reveal');
+    
     elements.forEach(el => {
       observer.observe(el);
     });
@@ -26,11 +43,6 @@ const ServicesSection = () => {
         observer.unobserve(el);
       });
     };
-  };
-
-  useEffect(() => {
-    const cleanup = animateOnScroll();
-    return cleanup;
   }, []);
 
   const services = [
@@ -93,16 +105,20 @@ const ServicesSection = () => {
   ];
 
   return (
-    <section className="section-padding bg-white relative">
+    <section id="services-section" className="section-padding bg-white relative overflow-hidden">
+      {/* Background gradient elements */}
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-marketing-50 rounded-full opacity-60 blur-3xl"></div>
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-marketing-50 rounded-full opacity-60 blur-3xl"></div>
+      
       <div className="container">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="inline-block bg-marketing-50 text-marketing-600 px-4 py-1 rounded-full text-sm font-medium mb-4 animate-reveal">
+          <span className="inline-block bg-marketing-50 text-marketing-600 px-4 py-1 rounded-full text-sm font-medium mb-4 animate-reveal" data-delay="0">
             Our Services
           </span>
-          <h2 className="heading-xl animate-reveal">
+          <h2 className="heading-xl mb-6 animate-reveal" data-delay="100">
             Comprehensive Digital Marketing Solutions
           </h2>
-          <p className="body-lg text-gray-600 mt-4 animate-reveal">
+          <p className="body-lg text-gray-600 animate-reveal" data-delay="200">
             We offer a wide range of digital marketing services to help your business thrive online.
           </p>
         </div>
@@ -111,27 +127,27 @@ const ServicesSection = () => {
           {services.map((service) => (
             <div 
               key={service.id} 
-              className="glass p-8 rounded-2xl animate-reveal"
-              style={{ animationDelay: `${service.delay}ms` }}
+              className="glass p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 animate-reveal"
+              data-delay={service.delay}
             >
               <div className="bg-marketing-50 rounded-xl w-16 h-16 flex items-center justify-center mb-6">
                 {service.icon}
               </div>
-              <h3 className="heading-sm mb-3">{service.title}</h3>
+              <h3 className="heading-sm mb-3 text-secondary">{service.title}</h3>
               <p className="text-gray-600 mb-6">{service.description}</p>
               <Link
                 to={service.link}
                 className="text-marketing-600 font-medium hover:text-marketing-700 inline-flex items-center group"
               >
                 Learn More
-                <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-2 transition-transform" />
               </Link>
             </div>
           ))}
         </div>
 
-        <div className="mt-16 text-center animate-reveal">
-          <Link to="/services" className="btn-primary">
+        <div className="mt-16 text-center animate-reveal" data-delay="700">
+          <Link to="/services" className="btn-primary shadow-md hover:shadow-lg">
             Explore All Services
           </Link>
         </div>
