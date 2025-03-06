@@ -1,5 +1,18 @@
-
-export type BlockType = 'heading' | 'paragraph' | 'image' | 'quote' | 'columns' | 'html';
+export type BlockType = 
+  | 'heading' 
+  | 'paragraph' 
+  | 'image' 
+  | 'quote' 
+  | 'columns' 
+  | 'html'
+  | 'ordered-list'
+  | 'checklist'
+  | 'table'
+  | 'youtube'
+  | 'video'
+  | 'map'
+  | 'file'
+  | 'callout';
 
 export interface ContentBlock {
   id: string;
