@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +16,18 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save, ImagePlus, ArrowUpDown, Loader2 } from "lucide-react";
 import { LoadingState } from "@/components/page-editor/LoadingState";
+import { supabase } from "@/lib/supabase";
+import { v4 as uuidv4 } from "uuid";
+
+interface ServiceFormData {
+  title: string;
+  slug: string;
+  description: string;
+  imageUrl: string;
+  icon: string;
+  isFeatured: boolean;
+  orderIndex: number;
+}
 
 const ServiceEditor = () => {
   const { id } = useParams();
@@ -24,7 +35,7 @@ const ServiceEditor = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [service, setService] = useState({
+  const [service, setService] = useState<ServiceFormData>({
     title: "",
     slug: "",
     description: "",
@@ -34,24 +45,45 @@ const ServiceEditor = () => {
     orderIndex: 0
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (id) {
       setLoading(true);
-      // Simulate loading service data
-      setTimeout(() => {
-        setService({
-          title: "Digital Marketing",
-          slug: "digital-marketing",
-          description: "Boost your online presence with our comprehensive digital marketing services.",
-          imageUrl: "/placeholder.svg",
-          icon: "BarChart",
-          isFeatured: true,
-          orderIndex: 1
-        });
-        setLoading(false);
-      }, 1000);
+      fetchService(id);
     }
   }, [id]);
+
+  const fetchService = async (serviceId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('id', serviceId)
+        .single();
+      
+      if (error) throw error;
+      
+      if (data) {
+        setService({
+          title: data.title,
+          slug: data.slug,
+          description: data.description || "",
+          imageUrl: data.image_url || "",
+          icon: data.icon || "",
+          isFeatured: data.is_featured,
+          orderIndex: data.order_index
+        });
+      }
+    } catch (error: any) {
+      console.error("Error fetching service:", error);
+      toast({
+        title: "Error",
+        description: "Could not load service data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -62,19 +94,89 @@ const ServiceEditor = () => {
     setService(prev => ({ ...prev, isFeatured: checked }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const generateSlugFromTitle = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^\w\s]/gi, '')
+      .replace(/\s+/g, '-');
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setService(prev => ({ 
+      ...prev, 
+      title: newTitle,
+      slug: !prev.slug || prev.slug === generateSlugFromTitle(prev.title) 
+        ? generateSlugFromTitle(newTitle) 
+        : prev.slug
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!service.title.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!service.slug.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Slug is required",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSaving(true);
     
-    // Simulate saving
-    setTimeout(() => {
-      setSaving(false);
+    try {
+      const serviceData = {
+        title: service.title,
+        slug: service.slug,
+        description: service.description,
+        image_url: service.imageUrl,
+        icon: service.icon,
+        is_featured: service.isFeatured,
+        order_index: service.orderIndex
+      };
+
+      let result;
+      
+      if (id) {
+        result = await supabase
+          .from('services')
+          .update(serviceData)
+          .eq('id', id);
+      } else {
+        result = await supabase
+          .from('services')
+          .insert(serviceData);
+      }
+
+      if (result.error) throw result.error;
+      
       toast({
         title: "Success",
         description: id ? "Service updated successfully" : "Service created successfully",
       });
+      
       navigate("/dashboard/services");
-    }, 1500);
+    } catch (error: any) {
+      console.error("Error saving service:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save service. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -127,8 +229,9 @@ const ServiceEditor = () => {
                 id="title" 
                 name="title" 
                 value={service.title} 
-                onChange={handleChange} 
+                onChange={handleTitleChange} 
                 placeholder="Enter service title" 
+                required
               />
             </div>
             <div className="space-y-2">
@@ -139,6 +242,7 @@ const ServiceEditor = () => {
                 value={service.slug} 
                 onChange={handleChange} 
                 placeholder="enter-slug-here" 
+                required
               />
             </div>
           </div>
