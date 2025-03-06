@@ -1,11 +1,67 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { 
-  Share2, Code, PenTool, Search, BarChart, Facebook, Instagram, ArrowRight
+  Share2, Code, PenTool, Search, BarChart, Facebook, Instagram, ArrowRight, Package
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+
+interface Service {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  icon: string;
+  is_featured: boolean;
+}
 
 const ServicesSection = () => {
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch featured services from Supabase
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('services')
+          .select('*')
+          .eq('is_featured', true)
+          .order('order_index', { ascending: true })
+          .limit(7); // Limit to 7 featured services
+          
+        if (error) {
+          console.error('Error fetching services:', error);
+          return;
+        }
+        
+        if (data) {
+          setServices(data);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchServices();
+  }, []);
+
+  // Get icon component based on icon name
+  const getIconComponent = (iconName: string) => {
+    switch (iconName?.toLowerCase()) {
+      case 'share2': return <Share2 className="h-8 w-8 text-marketing-500" />;
+      case 'code': return <Code className="h-8 w-8 text-marketing-500" />;
+      case 'pentool': return <PenTool className="h-8 w-8 text-marketing-500" />;
+      case 'search': return <Search className="h-8 w-8 text-marketing-500" />;
+      case 'barchart': return <BarChart className="h-8 w-8 text-marketing-500" />;
+      case 'facebook': return <Facebook className="h-8 w-8 text-marketing-500" />;
+      case 'instagram': return <Instagram className="h-8 w-8 text-marketing-500" />;
+      default: return <Package className="h-8 w-8 text-marketing-500" />; // Default icon
+    }
+  };
+
   // Improved animation with better performance
   useEffect(() => {
     // Using Intersection Observer for better performance
@@ -45,65 +101,6 @@ const ServicesSection = () => {
     };
   }, []);
 
-  const services = [
-    {
-      id: 1,
-      title: "Social Media Marketing",
-      description: "Boost your brand visibility and engagement with strategic social media campaigns.",
-      icon: <Share2 className="h-8 w-8 text-marketing-500" />,
-      link: "/services/social-media-marketing",
-      delay: 0,
-    },
-    {
-      id: 2,
-      title: "Web Development",
-      description: "Create stunning, responsive websites that convert visitors into customers.",
-      icon: <Code className="h-8 w-8 text-marketing-500" />,
-      link: "/services/web-development",
-      delay: 100,
-    },
-    {
-      id: 3,
-      title: "Brand Development",
-      description: "Build a distinctive brand identity that resonates with your target audience.",
-      icon: <PenTool className="h-8 w-8 text-marketing-500" />,
-      link: "/services/brand-development",
-      delay: 200,
-    },
-    {
-      id: 4,
-      title: "Search Engine Optimization",
-      description: "Improve your website's visibility in search results and drive organic traffic.",
-      icon: <Search className="h-8 w-8 text-marketing-500" />,
-      link: "/services/seo",
-      delay: 300,
-    },
-    {
-      id: 5,
-      title: "Google Ads",
-      description: "Target potential customers with precision and maximize your ROI with Google Ads.",
-      icon: <BarChart className="h-8 w-8 text-marketing-500" />,
-      link: "/services/google-ads",
-      delay: 400,
-    },
-    {
-      id: 6,
-      title: "Facebook Ads",
-      description: "Reach your ideal audience and grow your business with effective Facebook advertising.",
-      icon: <Facebook className="h-8 w-8 text-marketing-500" />,
-      link: "/services/facebook-ads",
-      delay: 500,
-    },
-    {
-      id: 7,
-      title: "Social Media Ads",
-      description: "Engage with potential customers across various social media platforms.",
-      icon: <Instagram className="h-8 w-8 text-marketing-500" />,
-      link: "/services/social-media-ads",
-      delay: 600,
-    },
-  ];
-
   return (
     <section id="services-section" className="section-padding bg-white relative overflow-hidden">
       {/* Background gradient elements */}
@@ -124,26 +121,30 @@ const ServicesSection = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service) => (
-            <div 
-              key={service.id} 
-              className="glass p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 animate-reveal"
-              data-delay={service.delay}
-            >
-              <div className="bg-marketing-50 rounded-xl w-16 h-16 flex items-center justify-center mb-6">
-                {service.icon}
-              </div>
-              <h3 className="heading-sm mb-3 text-secondary">{service.title}</h3>
-              <p className="text-gray-600 mb-6">{service.description}</p>
-              <Link
-                to={service.link}
-                className="text-marketing-600 font-medium hover:text-marketing-700 inline-flex items-center group"
+          {loading ? (
+            <div className="col-span-3 text-center">Loading services...</div>
+          ) : (
+            services.map((service, index) => (
+              <div 
+                key={service.id} 
+                className="glass p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 animate-reveal"
+                data-delay={index * 100}
               >
-                Learn More
-                <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-2 transition-transform" />
-              </Link>
-            </div>
-          ))}
+                <div className="bg-marketing-50 rounded-xl w-16 h-16 flex items-center justify-center mb-6">
+                  {getIconComponent(service.icon)}
+                </div>
+                <h3 className="heading-sm mb-3 text-secondary">{service.title}</h3>
+                <p className="text-gray-600 mb-6">{service.description}</p>
+                <Link
+                  to={`/services/${service.slug}`}
+                  className="text-marketing-600 font-medium hover:text-marketing-700 inline-flex items-center group"
+                >
+                  Learn More
+                  <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-2 transition-transform" />
+                </Link>
+              </div>
+            ))
+          )}
         </div>
 
         <div className="mt-16 text-center animate-reveal" data-delay="700">

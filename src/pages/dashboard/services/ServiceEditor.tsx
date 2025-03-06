@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -149,14 +150,16 @@ const ServiceEditor = () => {
       let result;
       
       if (id) {
+        // Update existing service
         result = await supabase
           .from('services')
           .update(serviceData)
           .eq('id', id);
       } else {
+        // Create new service
         result = await supabase
           .from('services')
-          .insert(serviceData);
+          .insert([serviceData]);
       }
 
       if (result.error) throw result.error;
