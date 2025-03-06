@@ -4,7 +4,7 @@ import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import ScrollToTop from "../components/common/ScrollToTop";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Share2, Code, PenTool, Search, BarChart, Facebook, Instagram, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 
@@ -65,14 +65,14 @@ const Services = () => {
   // Map icon names to components
   const getIconComponent = (iconName: string) => {
     switch (iconName?.toLowerCase()) {
-      case 'share2': return 'Share2';
-      case 'code': return 'Code';
-      case 'pentool': return 'PenTool';
-      case 'search': return 'Search';
-      case 'barchart': return 'BarChart';
-      case 'facebook': return 'Facebook';
-      case 'instagram': return 'Instagram';
-      default: return 'Package'; // Default icon
+      case 'share2': return <Share2 className="h-6 w-6 text-marketing-500" />;
+      case 'code': return <Code className="h-6 w-6 text-marketing-500" />;
+      case 'pentool': return <PenTool className="h-6 w-6 text-marketing-500" />;
+      case 'search': return <Search className="h-6 w-6 text-marketing-500" />;
+      case 'barchart': return <BarChart className="h-6 w-6 text-marketing-500" />;
+      case 'facebook': return <Facebook className="h-6 w-6 text-marketing-500" />;
+      case 'instagram': return <Instagram className="h-6 w-6 text-marketing-500" />;
+      default: return <Package className="h-6 w-6 text-marketing-500" />; // Default icon
     }
   };
 
@@ -113,9 +113,7 @@ const Services = () => {
                     className="glass p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
                   >
                     <div className="bg-marketing-50 rounded-xl w-16 h-16 flex items-center justify-center mb-6">
-                      <span className="text-marketing-500 text-2xl">
-                        {getIconComponent(service.icon)}
-                      </span>
+                      {getIconComponent(service.icon)}
                     </div>
                     <h3 className="heading-sm mb-3 text-secondary">{service.title}</h3>
                     <p className="text-gray-600 mb-6">{service.description}</p>

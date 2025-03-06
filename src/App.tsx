@@ -21,8 +21,9 @@ import DynamicPage from "./components/DynamicPage";
 import ServiceEditor from "./pages/dashboard/services/ServiceEditor";
 import BlogPostEditor from "./pages/dashboard/blog/BlogPostEditor";
 
-// Import the new pages
+// Import the pages
 import Services from "./pages/Services";
+import ServiceDetail from "./pages/ServiceDetail"; // Add this import
 import About from "./pages/About";
 import Portfolio from "./pages/Portfolio";
 import Blog from "./pages/Blog";
@@ -41,8 +42,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             
-            {/* New static routes */}
+            {/* Static routes */}
             <Route path="/services" element={<Services />} />
+            <Route path="/services/:slug" element={<ServiceDetail />} /> {/* Add this route */}
             <Route path="/about" element={<About />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/blog" element={<Blog />} />
@@ -68,7 +70,7 @@ const App = () => (
             {/* Dynamic Page Route */}
             <Route path="/:slug" element={<DynamicPage />} />
             
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
