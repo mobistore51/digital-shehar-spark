@@ -59,21 +59,21 @@ const WorkSection = () => {
   ];
 
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-gray-50">
+    <section className="py-10 md:py-12 bg-gray-50">
       <div className="container px-4">
-        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
-          <span className="inline-block bg-marketing-50 text-marketing-600 px-4 py-1 rounded-full text-sm font-medium mb-3 animate-reveal">
+        <div className="text-center max-w-3xl mx-auto mb-8">
+          <span className="inline-block bg-marketing-50 text-marketing-600 px-4 py-1 rounded-full text-sm font-medium mb-2 animate-reveal">
             Our Portfolio
           </span>
-          <h2 className="heading-xl animate-reveal">
+          <h2 className="text-3xl font-bold animate-reveal">
             Recent Success Stories
           </h2>
-          <p className="body-lg text-gray-600 mt-3 animate-reveal">
+          <p className="text-gray-600 mt-2 animate-reveal">
             Take a look at some of our recent projects and see how we've helped businesses achieve their goals.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
           {projects.map((project) => (
             <Link 
               key={project.id} 
@@ -82,7 +82,7 @@ const WorkSection = () => {
               style={{ animationDelay: `${project.delay}ms` }}
             >
               <div className="relative overflow-hidden rounded-2xl shadow-lg">
-                <div className="relative h-60 overflow-hidden">
+                <div className="relative h-52 overflow-hidden">
                   <img 
                     src={project.image} 
                     alt={project.title} 
@@ -90,11 +90,11 @@ const WorkSection = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                  <span className="inline-block bg-marketing-500/20 text-marketing-50 px-3 py-1 rounded-full text-xs font-medium mb-2">
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                  <span className="inline-block bg-marketing-500/20 text-marketing-50 px-3 py-1 rounded-full text-xs font-medium mb-1">
                     {project.category}
                   </span>
-                  <h3 className="text-xl font-bold mb-2">{project.title}</h3>
+                  <h3 className="text-lg font-bold mb-1">{project.title}</h3>
                   <div className="flex items-center font-medium text-sm transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                     View Project <ArrowRight className="ml-2 h-4 w-4" />
                   </div>
@@ -104,7 +104,7 @@ const WorkSection = () => {
           ))}
         </div>
 
-        <div className="mt-8 md:mt-10 text-center animate-reveal">
+        <div className="mt-6 md:mt-8 text-center animate-reveal">
           <Link to="/work" className="btn-primary">
             View All Projects
           </Link>

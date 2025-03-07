@@ -30,11 +30,13 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         <Hero />
-        <ServicesSection />
-        <AboutSection />
-        <TestimonialsSection />
-        <WorkSection />
-        <CtaSection />
+        <div className="space-y-0">
+          <ServicesSection />
+          <AboutSection />
+          <TestimonialsSection />
+          <WorkSection />
+          <CtaSection />
+        </div>
       </main>
       <Footer />
       <ScrollToTop />
