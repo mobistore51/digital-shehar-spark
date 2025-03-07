@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Plus, RefreshCw } from "lucide-react";
-import { ServiceListProvider } from "./services/context/ServiceListContext";
+import { ServiceListProvider, useServiceList } from "./services/context/ServiceListContext";
 import ServiceList from "./services/components/ServiceList";
 import ServiceSearchBar from "./services/components/ServiceSearchBar";
 
