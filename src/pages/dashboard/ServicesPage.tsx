@@ -52,7 +52,7 @@ const ServicesPage = () => {
 };
 
 const RefreshButton = () => {
-  const { fetchServices } = React.useContext(require('./services/context/ServiceListContext').ServiceListContext);
+  const { fetchServices } = useServiceList();
   
   return (
     <Button variant="ghost" size="sm" onClick={fetchServices} className="flex items-center gap-2">
