@@ -102,17 +102,17 @@ const ServicesSection = () => {
   }, []);
 
   return (
-    <section id="services-section" className="section-padding bg-white relative overflow-hidden">
+    <section id="services-section" className="py-12 md:py-16 lg:py-20 bg-white relative overflow-hidden">
       {/* Background gradient elements */}
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-marketing-50 rounded-full opacity-60 blur-3xl"></div>
       <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-marketing-50 rounded-full opacity-60 blur-3xl"></div>
       
-      <div className="container">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="inline-block bg-marketing-50 text-marketing-600 px-4 py-1 rounded-full text-sm font-medium mb-4 animate-reveal" data-delay="0">
+      <div className="container px-4">
+        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-14">
+          <span className="inline-block bg-marketing-50 text-marketing-600 px-4 py-1 rounded-full text-sm font-medium mb-3 animate-reveal" data-delay="0">
             Our Services
           </span>
-          <h2 className="heading-xl mb-6 animate-reveal" data-delay="100">
+          <h2 className="heading-xl mb-4 animate-reveal" data-delay="100">
             Comprehensive Digital Marketing Solutions
           </h2>
           <p className="body-lg text-gray-600 animate-reveal" data-delay="200">
@@ -120,21 +120,21 @@ const ServicesSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {loading ? (
             <div className="col-span-3 text-center">Loading services...</div>
           ) : (
             services.map((service, index) => (
               <div 
                 key={service.id} 
-                className="glass p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 animate-reveal"
+                className="glass p-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 animate-reveal"
                 data-delay={index * 100}
               >
-                <div className="bg-marketing-50 rounded-xl w-16 h-16 flex items-center justify-center mb-6">
+                <div className="bg-marketing-50 rounded-xl w-14 h-14 flex items-center justify-center mb-4">
                   {getIconComponent(service.icon)}
                 </div>
-                <h3 className="heading-sm mb-3 text-secondary">{service.title}</h3>
-                <p className="text-gray-600 mb-6">{service.description}</p>
+                <h3 className="heading-sm mb-2 text-secondary">{service.title}</h3>
+                <p className="text-gray-600 mb-4">{service.description}</p>
                 <Link
                   to={`/services/${service.slug}`}
                   className="text-marketing-600 font-medium hover:text-marketing-700 inline-flex items-center group"
@@ -147,7 +147,7 @@ const ServicesSection = () => {
           )}
         </div>
 
-        <div className="mt-16 text-center animate-reveal" data-delay="700">
+        <div className="mt-10 md:mt-12 text-center animate-reveal" data-delay="700">
           <Link to="/services" className="btn-primary shadow-md hover:shadow-lg">
             Explore All Services
           </Link>

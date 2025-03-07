@@ -59,21 +59,21 @@ const WorkSection = () => {
   ];
 
   return (
-    <section className="section-padding bg-gray-50">
-      <div className="container">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="inline-block bg-marketing-50 text-marketing-600 px-4 py-1 rounded-full text-sm font-medium mb-4 animate-reveal">
+    <section className="py-12 md:py-16 lg:py-20 bg-gray-50">
+      <div className="container px-4">
+        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
+          <span className="inline-block bg-marketing-50 text-marketing-600 px-4 py-1 rounded-full text-sm font-medium mb-3 animate-reveal">
             Our Portfolio
           </span>
           <h2 className="heading-xl animate-reveal">
             Recent Success Stories
           </h2>
-          <p className="body-lg text-gray-600 mt-4 animate-reveal">
+          <p className="body-lg text-gray-600 mt-3 animate-reveal">
             Take a look at some of our recent projects and see how we've helped businesses achieve their goals.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {projects.map((project) => (
             <Link 
               key={project.id} 
@@ -82,7 +82,7 @@ const WorkSection = () => {
               style={{ animationDelay: `${project.delay}ms` }}
             >
               <div className="relative overflow-hidden rounded-2xl shadow-lg">
-                <div className="relative h-64 overflow-hidden">
+                <div className="relative h-60 overflow-hidden">
                   <img 
                     src={project.image} 
                     alt={project.title} 
@@ -104,7 +104,7 @@ const WorkSection = () => {
           ))}
         </div>
 
-        <div className="mt-12 text-center animate-reveal">
+        <div className="mt-8 md:mt-10 text-center animate-reveal">
           <Link to="/work" className="btn-primary">
             View All Projects
           </Link>

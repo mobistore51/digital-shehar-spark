@@ -28,40 +28,40 @@ const CtaSection = () => {
   };
 
   return (
-    <section className="section-padding bg-marketing-600 relative overflow-hidden">
+    <section className="py-12 md:py-16 lg:py-20 bg-marketing-600 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-marketing-400 rounded-full -translate-y-1/2 translate-x-1/2 opacity-20 blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-marketing-700 rounded-full translate-y-1/2 -translate-x-1/2 opacity-20 blur-3xl"></div>
       
-      <div className="container">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="container px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Content */}
           <div>
-            <span className="inline-block bg-white/10 text-white/90 px-4 py-1 rounded-full text-sm font-medium mb-4 animate-reveal">
+            <span className="inline-block bg-white/10 text-white/90 px-4 py-1 rounded-full text-sm font-medium mb-3 animate-reveal">
               Get Started Today
             </span>
             <h2 className="heading-xl text-white animate-reveal">
               Ready to Transform Your Digital Presence?
             </h2>
-            <p className="body-lg text-white/80 mt-4 mb-6 animate-reveal">
+            <p className="body-lg text-white/80 mt-3 mb-6 animate-reveal">
               Contact us today for a free consultation and learn how our digital marketing services can help your business grow.
             </p>
             
-            <div className="space-y-4 mb-8 animate-reveal">
+            <div className="space-y-3 mb-6 animate-reveal">
               <div className="flex items-start">
-                <div className="bg-white/10 rounded-full p-1 mt-1 mr-4">
+                <div className="bg-white/10 rounded-full p-1 mt-1 mr-3">
                   <Check className="h-4 w-4 text-white" />
                 </div>
                 <p className="text-white/90">Expert team ready to help you succeed</p>
               </div>
               <div className="flex items-start">
-                <div className="bg-white/10 rounded-full p-1 mt-1 mr-4">
+                <div className="bg-white/10 rounded-full p-1 mt-1 mr-3">
                   <Check className="h-4 w-4 text-white" />
                 </div>
                 <p className="text-white/90">Customized strategies for your specific needs</p>
               </div>
               <div className="flex items-start">
-                <div className="bg-white/10 rounded-full p-1 mt-1 mr-4">
+                <div className="bg-white/10 rounded-full p-1 mt-1 mr-3">
                   <Check className="h-4 w-4 text-white" />
                 </div>
                 <p className="text-white/90">Measurable results and transparent reporting</p>
@@ -72,7 +72,7 @@ const CtaSection = () => {
           {/* Form */}
           <div className="animate-reveal">
             <div className="bg-white rounded-2xl p-6 md:p-8 shadow-xl">
-              <h3 className="heading-md mb-6">Get a Free Consultation</h3>
+              <h3 className="heading-md mb-5">Get a Free Consultation</h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -110,7 +110,7 @@ const CtaSection = () => {
                     id="message"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    rows={4}
+                    rows={3}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-marketing-400 focus:border-marketing-400 transition-colors"
                     placeholder="Tell us about your project..."
                     required

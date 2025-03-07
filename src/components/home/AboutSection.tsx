@@ -41,13 +41,13 @@ const AboutSection = () => {
   ];
 
   return (
-    <section className="section-padding bg-gray-50 relative overflow-hidden">
+    <section className="py-12 md:py-16 lg:py-20 bg-gray-50 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-marketing-100 rounded-full -translate-y-1/2 translate-x-1/2 opacity-40 blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-marketing-100 rounded-full translate-y-1/2 -translate-x-1/2 opacity-40 blur-3xl"></div>
       
-      <div className="container">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <div className="container px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           {/* Image Column */}
           <div className="order-2 lg:order-1">
             <div className="relative animate-reveal">
@@ -68,17 +68,17 @@ const AboutSection = () => {
           
           {/* Content Column */}
           <div className="order-1 lg:order-2">
-            <span className="inline-block bg-marketing-50 text-marketing-600 px-4 py-1 rounded-full text-sm font-medium mb-4 animate-reveal">
+            <span className="inline-block bg-marketing-50 text-marketing-600 px-4 py-1 rounded-full text-sm font-medium mb-3 animate-reveal">
               About DigitalShehar
             </span>
             <h2 className="heading-xl animate-reveal">
               Digital Solutions That Drive Business Growth
             </h2>
-            <p className="body-lg text-gray-600 mt-4 mb-6 animate-reveal">
+            <p className="body-lg text-gray-600 mt-4 mb-5 animate-reveal">
               At DigitalShehar, we're passionate about helping businesses succeed in the digital world. Our team of experts combines creativity with technical expertise to deliver results-driven solutions.
             </p>
             
-            <div className="space-y-3 mb-8 animate-reveal">
+            <div className="space-y-2 mb-6 animate-reveal">
               {features.map((feature, index) => (
                 <div key={index} className="flex items-start">
                   <CheckCircle className="h-5 w-5 text-marketing-500 mt-1 mr-3 flex-shrink-0" />

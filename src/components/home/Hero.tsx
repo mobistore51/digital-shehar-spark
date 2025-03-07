@@ -47,7 +47,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background with improved image quality and overlay */}
       <div 
         ref={bgRef}
@@ -60,15 +60,15 @@ const Hero = () => {
       </div>
 
       {/* Content with improved spacing and typography */}
-      <div className="container relative z-10 pt-28 pb-16 md:pt-32 md:pb-20" ref={contentRef}>
+      <div className="container relative z-10 py-16 md:py-20" ref={contentRef}>
         <div className="max-w-3xl mx-auto md:mx-0 text-white">
-          <span className="inline-block bg-marketing-500/30 text-marketing-50 px-5 py-2 rounded-full text-sm font-medium mb-8 animate-fade-in-up shadow-lg">
+          <span className="inline-block bg-marketing-500/30 text-marketing-50 px-5 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in-up shadow-lg">
             Leading Digital Marketing Agency
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight animate-fade-in-up" style={{ animationDelay: "200ms" }}>
             Transform Your <span className="text-marketing-300">Digital Presence</span> with Strategic Marketing
           </h1>
-          <p className="text-lg md:text-xl mt-8 mb-10 text-white/90 font-light max-w-2xl animate-fade-in-up" style={{ animationDelay: "400ms" }}>
+          <p className="text-lg md:text-xl mt-6 mb-8 text-white/90 font-light max-w-2xl animate-fade-in-up" style={{ animationDelay: "400ms" }}>
             We help businesses grow their online presence and achieve remarkable results through data-driven digital marketing strategies and stunning web development.
           </p>
           <div className="flex flex-wrap gap-5 animate-fade-in-up" style={{ animationDelay: "600ms" }}>
@@ -89,7 +89,7 @@ const Hero = () => {
       </div>
 
       {/* Scroll down indicator */}
-      <div className="absolute bottom-10 left-0 right-0 flex justify-center animate-bounce text-white z-10">
+      <div className="absolute bottom-6 left-0 right-0 flex justify-center animate-bounce text-white z-10">
         <button 
           onClick={scrollToNextSection}
           className="flex flex-col items-center opacity-80 hover:opacity-100 transition-opacity"
