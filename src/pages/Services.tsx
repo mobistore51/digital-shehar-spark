@@ -110,19 +110,19 @@ const Services = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="glass p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                    className="glass p-6 rounded-2xl shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
                   >
-                    <div className="bg-marketing-50 rounded-xl w-16 h-16 flex items-center justify-center mb-6">
+                    <div className="bg-marketing-50 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
                       {getIconComponent(service.icon)}
                     </div>
-                    <h3 className="heading-sm mb-3 text-secondary">{service.title}</h3>
-                    <p className="text-gray-600 mb-6">{service.description}</p>
+                    <h3 className="heading-sm mb-2 text-secondary">{service.title}</h3>
+                    <p className="text-gray-600 mb-4 text-sm flex-grow line-clamp-3">{service.description}</p>
                     <Link
                       to={`/services/${service.slug}`}
-                      className="text-marketing-600 font-medium hover:text-marketing-700 inline-flex items-center group"
+                      className="text-marketing-600 text-sm font-medium hover:text-marketing-700 inline-flex items-center group mt-auto"
                     >
                       Learn More
-                      <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-2 transition-transform" />
+                      <ArrowRight className="ml-1 h-3.5 w-3.5 transform group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </motion.div>
                 ))}
